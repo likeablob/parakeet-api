@@ -371,19 +371,15 @@ def install_daemon_action(args):
         # Owner read/write only
         env_file.touch(mode=0o600)
 
-        # Try to find a template from source or nearby
-        example_env = Path(".env.example")
-        if not example_env.exists():
-            # Check if we are in a source repo (parent of parent)
-            pkg_root = Path(__file__).resolve().parent.parent.parent
-            example_env = pkg_root / ".env.example"
+        # Try to find a template from the package itself
+        example_env = Path(__file__).parent / ".env.example"
 
         if example_env.exists():
             shutil.copy(example_env, env_file)
             print(f"Created configuration file from template: {env_file}")
         else:
             env_file.write_text(
-                "# Parakeet API Configuration\n# See https://github.com/likeablob/parakeet-api for options\n",
+                "# Parakeet API Configuration\n# See parakeet-api serve --help for options\n",
                 encoding="utf-8",
             )
             print(f"Created configuration file: {env_file}")

@@ -24,6 +24,7 @@ RUN uv sync --frozen --no-dev --no-install-project
 # Copy source code and README (required by hatchling/pyproject.toml)
 COPY src/ ./src/
 COPY README.md ./
+COPY .env.example ./
 
 # Complete installation including the project itself
 RUN uv sync --frozen --no-dev
