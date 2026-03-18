@@ -2,6 +2,13 @@
 
 OpenAI Whisper-compatible API endpoint for Parakeet STT models. (MLX for Apple Silicon, Sherpa-ONNX for others)
 
+Performance on a 3.85s wav file:
+
+| Machine (Engine)              | Latency (ms) | Speedup |
+| :---------------------------- | :----------- | :------ |
+| Intel 255H (Sherpa-ONNX, CPU) | 174.46       | 22.1x   |
+| M2 Air (MLX, GPU)             | 194.29       | 19.8x   |
+
 ## Installation & Setup
 
 The easiest way to install and run parakeet-api is using [uv](https://github.com/astral-sh/uv).
