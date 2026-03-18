@@ -218,6 +218,10 @@ uv run pytest tests/mock
 uv run pytest tests/inference # Requires models
 ```
 
+## Related Projects
+
+- [push-to-whisper](https://github.com/likeablob/push-to-whisper): Push key to record audio & STT.
+
 ## License
 
 MIT
