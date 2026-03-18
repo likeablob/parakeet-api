@@ -1,0 +1,23 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8816:8816"
+    env_file:
+      - .env
+    volumes:
+      - type: bind
+        source: ./models
+        target: /app/models
+    environment:
+      # Required for server to bind correctly in Docker
+      - SERVER__HOST=0.0.0.0
+      - SERVER__PORT=8816
+      # Path inside the container where models are mounted
+      - STT__MODELS_DIR=/app/models
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

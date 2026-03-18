@@ -1,0 +1,14 @@
+# Ignore everything by default
+*
+
+# Allow specific files and directories
+!src/
+!pyproject.toml
+!uv.lock
+!README.md
+!Dockerfile
+
+# Ignore python cache files in allowed directories
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
