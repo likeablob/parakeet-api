@@ -18,6 +18,10 @@ dependencies = [
     "huggingface-hub>=1.7.1",
 ]
 
+[project.urls]
+Documentation = "https://github.com/likeablob/parakeet-api"
+Source = "https://github.com/likeablob/parakeet-api"
+
 [project.scripts]
 parakeet-api = "parakeet_api.main:main"
 
