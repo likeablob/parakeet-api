@@ -79,7 +79,7 @@ class STTEngine:
         # 1. Try pydub
         try:
             audio = AudioSegment.from_file(io.BytesIO(audio_bytes))
-            audio = audio.set_frame_rate(16000).set_channels(1)
+            audio = audio.set_frame_rate(16000).set_channels(1).set_sample_width(2)
             elapsed = (time.perf_counter() - start) * 1000
             logging.debug(f"Audio conversion: pydub used ({elapsed:.2f}ms)")
             return audio.raw_data, 16000
