@@ -58,19 +58,6 @@ parakeet-api download mlx
 
 You can use different Parakeet models by specifying a URL or Repo ID.
 
-**MLX:**
-
-- [Parakeet - a mlx-community Collection](https://huggingface.co/collections/mlx-community/parakeet)
-
-1. Download using the script with --id:
-   ```bash
-   parakeet-api download mlx --id mlx-community/parakeet-tdt_ctc-0.6b-ja
-   ```
-2. Update STT__MLX__MODEL_ID in your .env (or set as environment variable):
-   ```env
-   STT__MLX__MODEL_ID=mlx-community/parakeet-tdt_ctc-0.6b-ja
-   ```
-
 **Sherpa-ONNX:**
 
 - [Sherpa-ONNX Pretrained Models](https://k2-fsa.github.io/sherpa/onnx/pretrained_models/index.html)
@@ -92,6 +79,19 @@ You can use different Parakeet models by specifying a URL or Repo ID.
 > [!NOTE]
 > The default model is a NeMo Parakeet TDT (Transducer). Other architectures like Zipformer (e.g. `sherpa-onnx-zipformer-ja-reazonspeech-2024-08-01`) are also supported but must be downloaded manually via `--url`.
 
+**MLX:**
+
+- [Parakeet - a mlx-community Collection](https://huggingface.co/collections/mlx-community/parakeet)
+
+1. Download using the script with --id:
+   ```bash
+   parakeet-api download mlx --id mlx-community/parakeet-tdt_ctc-0.6b-ja
+   ```
+2. Update STT__MLX__MODEL_ID in your .env (or set as environment variable):
+   ```env
+   STT__MLX__MODEL_ID=mlx-community/parakeet-tdt_ctc-0.6b-ja
+   ```
+
 ### 4. Run the Server
 
 ```bash
@@ -108,33 +108,53 @@ You can install parakeet-api as a background service (launchd on macOS, systemd 
 parakeet-api install-daemon
 ```
 
-This will create a service file and set up a configuration file at ~/.local/share/parakeet-api/.env.
+This will create a service file and set up a configuration file (e.g. `~/.local/share/parakeet-api/.env`).  
 To uninstall: `parakeet-api uninstall-daemon`
 
 ## Running with Docker (Sherpa-ONNX)
 
 For Linux or CPU environments, you can use Docker and Docker Compose.
 
-1. **Setup environment:**
+```bash
+# Download .env.example
+curl -o .env.example https://github.com/likeablob/parakeet-api/raw/refs/heads/main/.env.example
 
-   ```bash
-   cp .env.example .env
-   # Edit .env to set your SERVER__API_KEY and other settings
-   ```
+# Edit .env to set your SERVER__API_KEY and other settings
+cp .env.example .env
+editor .env
 
-2. **Download the model using Docker:**
+# Create compose.yaml
+cat << 'EOF' > compose.yaml
+services:
+  api:
+    image: ghcr.io/likeablob/parakeet-api:latest
+    ports:
+      - "8816:8816"
+    env_file:
+      - .env
+    volumes:
+      - type: bind
+        source: ./models
+        target: /app/models
+    environment:
+      - SERVER__HOST=0.0.0.0
+      - SERVER__PORT=8816
+      - STT__MODELS_DIR=/app/models
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+EOF
 
-   ```bash
-   # Download models into the ./models directory using the container
-   docker compose run --rm api download sherpa --out /app/models
-   ```
+# Download model
+mkdir models
+docker compose run --rm api download sherpa --out /app/models
 
-3. **Run with Docker Compose:**
-   ```bash
-   docker compose up --build
-   ```
-
-The ./models/ directory is bind-mounted into the container.
+# Start the server
+docker compose up -d
+```
 
 ## Usage
 
