@@ -15,6 +15,18 @@ DEFAULT_DATA_DIR = user_data_dir("parakeet-api")
 DEFAULT_MODELS_DIR = os.path.join(DEFAULT_DATA_DIR, "models")
 
 
+class HotwordsSettings(BaseModel):
+    default_score: float = Field(
+        default=1.5,
+        description="Default hotwords score when not specified per word (Env: STT__SHERPA__HOTWORDS__DEFAULT_SCORE)",
+    )
+    cache_size: int = Field(
+        default=1,
+        ge=0,
+        description="Number of hotword recognizers to cache (0=no cache, each ~670MB) (Env: STT__SHERPA__HOTWORDS__CACHE_SIZE)",
+    )
+
+
 class SherpaSettings(BaseModel):
     provider: str = Field(
         default="cpu",
@@ -28,6 +40,7 @@ class SherpaSettings(BaseModel):
         default=SHERPA_DEFAULT_MODEL,
         description="Model directory name (Env: STT__SHERPA__MODEL_ID)",
     )
+    hotwords: HotwordsSettings = HotwordsSettings()
 
 
 class MLXSettings(BaseModel):

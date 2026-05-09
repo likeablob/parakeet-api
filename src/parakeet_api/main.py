@@ -182,6 +182,7 @@ async def transcribe_audio(
     timestamp_granularities: Annotated[
         list[str] | None, Form(alias="timestamp_granularities[]")
     ] = None,
+    hotwords: Annotated[str | None, Form()] = None,
     _auth: Annotated[
         HTTPAuthorizationCredentials | None, Depends(verify_api_key)
     ] = None,
@@ -204,7 +205,7 @@ async def transcribe_audio(
     engine = get_stt_engine()
 
     try:
-        result = engine.transcribe(audio_data)
+        result = engine.transcribe(audio_data, hotwords=hotwords)
         text = result["text"]
         duration = result["duration"]
     except RuntimeError as e:
@@ -266,6 +267,7 @@ async def transcribe_audio_raw(
     timestamp_granularities: Annotated[
         list[str] | None, Query(alias="timestamp_granularities[]")
     ] = None,
+    hotwords: Annotated[str | None, Query()] = None,
     _auth: Annotated[
         HTTPAuthorizationCredentials | None, Depends(verify_api_key)
     ] = None,
@@ -279,7 +281,7 @@ async def transcribe_audio_raw(
     engine = get_stt_engine()
 
     try:
-        result = engine.transcribe(audio_data)
+        result = engine.transcribe(audio_data, hotwords=hotwords)
         text = result["text"]
         duration = result["duration"]
     except RuntimeError as e:
@@ -563,6 +565,11 @@ def main():
         default=config.settings.stt.models_dir,
         help=f"Output base directory (default: {config.settings.stt.models_dir})",
     )
+    sherpa_parser.add_argument(
+        "--generate-bpe-vocab",
+        action="store_true",
+        help="Generate bpe.vocab from tokens.txt for hotwords support",
+    )
 
     # Download MLX
     mlx_parser = dl_subparsers.add_parser("mlx", help="Download MLX model")
@@ -623,7 +630,11 @@ def main():
         output_base = Path(args.out).resolve()
 
         if args.engine == "sherpa":
-            download_utils.download_sherpa(args.url, output_base)
+            download_utils.download_sherpa(
+                args.url,
+                output_base,
+                generate_bpe_vocab=args.generate_bpe_vocab,
+            )
         elif args.engine == "mlx":
             download_utils.download_mlx(args.id, output_base)
         else:

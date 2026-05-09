@@ -80,10 +80,17 @@ You can use different Parakeet models by specifying a URL or Repo ID.
    ```bash
    parakeet-api download sherpa --url https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-nemo-parakeet-tdt_ctc-0.6b-ja-35000-int8.tar.bz2
    ```
+   For hotwords support on Transducer models (e.g. Parakeet TDT), also generate bpe.vocab:
+   ```bash
+   parakeet-api download sherpa --generate-bpe-vocab
+   ```
 2. Update STT__SHERPA__MODEL_ID in your .env (or set as environment variable):
    ```env
    STT__SHERPA__MODEL_ID=sherpa-onnx-nemo-parakeet-tdt_ctc-0.6b-ja-35000-int8
    ```
+
+> [!NOTE]
+> The default model is a NeMo Parakeet TDT (Transducer). Other architectures like Zipformer (e.g. `sherpa-onnx-zipformer-ja-reazonspeech-2024-08-01`) are also supported but must be downloaded manually via `--url`.
 
 ### 4. Run the Server
 
@@ -158,11 +165,12 @@ curl -X POST "http://localhost:8816/v1/audio/transcriptions/raw" \
 
 ### Supported Parameters
 
-| Parameter                 | Type   | Default     | Description                             |
-| ------------------------- | ------ | ----------- | --------------------------------------- |
-| file                      | file   | -           | The audio file to transcribe.           |
-| response_format           | string | json        | json, text, verbose_json, srt, vtt.     |
-| timestamp_granularities[] | array  | ["segment"] | word, segment (used with verbose_json). |
+| Parameter                 | Type   | Default     | Description                                                                |
+| ------------------------- | ------ | ----------- | -------------------------------------------------------------------------- |
+| file                      | file   | -           | The audio file to transcribe.                                              |
+| response_format           | string | json        | json, text, verbose_json, srt, vtt.                                        |
+| timestamp_granularities[] | array  | ["segment"] | word, segment (used with verbose_json).                                    |
+| hotwords                  | string | -           | Comma-separated hotwords for contextual biasing (e.g. `OpenAI:2.5,GPT-4`). |
 
 > [!NOTE]
 > **Limitations of Response Formats:**
@@ -174,6 +182,8 @@ curl -X POST "http://localhost:8816/v1/audio/transcriptions/raw" \
 > [!NOTE]
 > **Ignored Parameters:** The following parameters are accepted for compatibility with the OpenAI API but are currently **ignored**:
 > model, language, prompt, temperature.
+>
+> **Hotwords (Extension):** The `hotwords` parameter is a parakeet-api extension for contextual biasing. Supported on Sherpa-ONNX **Transducer** models only (NeMo TDT, Zipformer, Conformer). CTC models do not support hotwords. Requires `bpe.vocab` for NeMo TDT models (generate via `parakeet-api download sherpa --generate-bpe-vocab`).
 
 ### Examples
 
