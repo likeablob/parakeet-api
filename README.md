@@ -108,7 +108,7 @@ You can install parakeet-api as a background service (launchd on macOS, systemd 
 parakeet-api install-daemon
 ```
 
-This will create a service file and set up a configuration file (e.g. `~/.local/share/parakeet-api/.env`).  
+This will create a service file and set up a configuration file (e.g. `~/.local/share/parakeet-api/.env`).
 To uninstall: `parakeet-api uninstall-daemon`
 
 ## Running with Docker (Sherpa-ONNX)
@@ -225,10 +225,14 @@ For full API compatibility details, refer to the [OpenAI Audio API Reference](ht
    ```
 2. **Install dependencies:**
    ```bash
-   # Includes dev tools (ruff, ty, pytest) and optional mlx support
+   # Includes dev tools (ruff, ty, pytest, pre-commit) and optional mlx support
    uv sync --all-extras --dev
    ```
-3. **Run:**
+3. **Install pre-commit hooks:**
+   ```bash
+   uv run pre-commit install
+   ```
+4. **Run:**
    ```bash
    uv run parakeet-api serve
    ```
