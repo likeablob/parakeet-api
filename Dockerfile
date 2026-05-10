@@ -1,11 +1,22 @@
 # Use a slim Python image
 FROM python:3.12-slim
 
-# Install system dependencies (ffmpeg is required for non-WAV audio support)
+ARG TARGETARCH
+
+# Install ffmpeg static build (smaller than apt-get install ffmpeg)
 RUN <<EOF
 set -eux
 apt-get update
-apt-get install -y ffmpeg
+apt-get install -y --no-install-recommends curl ca-certificates xz-utils
+case "${TARGETARCH}" in
+    amd64) FFMPEG_ARCH="linux64" ;;
+    arm64) FFMPEG_ARCH="linuxarm64" ;;
+    *) echo "Unsupported architecture: ${TARGETARCH}" && exit 1 ;;
+esac
+curl -L "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-${FFMPEG_ARCH}-gpl.tar.xz" \
+    | tar xJ -C /usr/local --strip-components=1 --wildcards "ffmpeg-master-latest-${FFMPEG_ARCH}-gpl/bin/ffmpeg"
+apt-get purge -y curl xz-utils
+apt-get autoremove -y
 rm -rf /var/lib/apt/lists/*
 EOF
 
